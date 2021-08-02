@@ -45,6 +45,8 @@ class BlockyConfiguration:
         self.elasticsearch = elasticsearch.AsyncElasticsearch(hosts=[self.elasticsearch_url])
         self.block_list = []
         self.allow_list = list(DEFAULT_ALLOW_LIST)  # Always pre-seed with the basic default
+        self.http_ip = yml.get('bind_ip', '127.0.0.1')
+        self.http_port = int(yml.get('bind_port', 8080))
 
         # Create table if not there yet
         if not self.sqlite.table_exists("rules"):
