@@ -19,7 +19,7 @@
 # Definitions for SQLite tables used in Blocky/4
 
 CREATE_DB_RULES = """
-CREATE TABLE "banrules" (
+CREATE TABLE "rules" (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	"description"	TEXT NOT NULL,
 	"aggtype"	TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE "banrules" (
 """
 
 CREATE_DB_BANS = """
-CREATE TABLE "bans" (
+CREATE TABLE "blocklist" (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	"ip"	TEXT NOT NULL,
 	"reason"	TEXT NOT NULL,
