@@ -1,0 +1,6 @@
+# URL for the ElasticSearch backend
+elasticsearch_url: http://localhost:9200/
+# ES index pattern for strftime. Should have %Y-%m-%d in it, so we can fetch the last three days. Or * for every index
+index_pattern: loggy-%Y-%m-%d
+# SQLite database file path where we storre blocks, allows, rules and audit logs
+database: blocky4.sqlite
