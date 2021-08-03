@@ -3,3 +3,4 @@ aiohttp
 elasticsearch
 netaddr
 pyyaml
+ahapi==0.1.0
