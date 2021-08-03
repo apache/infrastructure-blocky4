@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ahapi.server
+import ahapi
 import plugins.configuration
 
 """ Generic block/allow list endpoint for Blocky/4"""
@@ -31,4 +31,4 @@ async def process(config: plugins.configuration.BlockyConfiguration, request, fo
 
 
 def register(config: plugins.configuration.BlockyConfiguration):
-    return ahapi.server.Endpoint(process)
+    return ahapi.endpoint(process)
