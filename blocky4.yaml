@@ -4,3 +4,6 @@ elasticsearch_url: http://localhost:9200/
 index_pattern: loggy-%Y-%m-%d
 # SQLite database file path where we storre blocks, allows, rules and audit logs
 database: blocky4.sqlite
+
+http_ip: "127.0.0.1"
+http_port: 8080
