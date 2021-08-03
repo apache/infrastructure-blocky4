@@ -21,9 +21,9 @@ import plugins.configuration
 """ Generic block/allow list endpoint for Blocky/4"""
 
 
-async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
-    block_list = [str(ip) for ip in state.block_list]
-    allow_list = [str(ip) for ip in state.allow_list]
+async def process(config: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
+    block_list = [str(ip) for ip in config.block_list]
+    allow_list = [str(ip) for ip in config.allow_list]
     return {
         "block_list": block_list,
         "allow_list": allow_list,
