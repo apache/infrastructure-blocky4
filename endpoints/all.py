@@ -30,5 +30,5 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     }
 
 
-def register(server: ahapi.server.Server):
+def register(config: plugins.configuration.BlockyConfiguration):
     return ahapi.server.Endpoint(process)
