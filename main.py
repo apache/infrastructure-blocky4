@@ -22,14 +22,14 @@ import asyncio
 import yaml
 import plugins.configuration
 import plugins.background
-import ahapi.server
+import ahapi
 
 
 async def main(loop: asyncio.BaseEventLoop):
     yml = yaml.safe_load(open('blocky4.yaml', 'r'))
     config = plugins.configuration.BlockyConfiguration(yml)
     loop.create_task(plugins.background.run(config))
-    httpserver = ahapi.server.Server(bind_ip=config.http_ip, bind_port=config.http_port, state=config)
+    httpserver = ahapi.simple(bind_ip=config.http_ip, bind_port=config.http_port, state=config)
     loop.create_task(httpserver.loop())
     while True:
         await asyncio.sleep(10)
