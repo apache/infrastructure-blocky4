@@ -26,13 +26,38 @@ import netaddr
 
 DEFAULT_EXPIRE = 86400 * 30 * 4  # Default expiry of auto-bans = 4 months
 DEFAULT_INDEX_PATTERN = "loggy-%Y-%m-%d"
+DEFAULT_HOST_BLOCK = "*"  # Default hostname to block on. * means all hosts
 
 # These IP blocks should always be allowed and never blocked, or else...
 DEFAULT_ALLOW_LIST = [
-    netaddr.IPNetwork("127.0.0.1/16"),
-    netaddr.IPNetwork("10.0.0.1/16"),
-    netaddr.IPNetwork("::1/128"),
+    "127.0.0.1/16",
+    "10.0.0.1/16",
+    "::1/128",
 ]
+
+
+class BlockyBlock(dict):
+    def __init__(self, ip: str, timestamp: int, expires: int, reason: str = None, host: str = "*"):
+        dict.__init__(self,
+                      ip=ip,
+                      timestamp=timestamp,
+                      expires=expires,
+                      reason=reason,
+                      host=host
+                      )
+        self.network = netaddr.IPNetwork(ip)
+
+
+class BlockyAllow(dict):
+    def __init__(self, ip: str, timestamp: int, expires: int, reason: str = None, host: str = "*"):
+        dict.__init__(self,
+                      ip=ip,
+                      timestamp=timestamp,
+                      expires=expires,
+                      reason=reason,
+                      host=host
+                      )
+        self.network = netaddr.IPNetwork(ip)
 
 
 class BlockyConfiguration:
@@ -44,7 +69,7 @@ class BlockyConfiguration:
         self.elasticsearch_url = yml.get("elasticsearch_url")
         self.elasticsearch = elasticsearch.AsyncElasticsearch(hosts=[self.elasticsearch_url])
         self.block_list = []
-        self.allow_list = list(DEFAULT_ALLOW_LIST)  # Always pre-seed with the basic default
+        self.allow_list = []
         self.http_ip = yml.get('bind_ip', '127.0.0.1')
         self.http_port = int(yml.get('bind_port', 8080))
 
@@ -59,9 +84,31 @@ class BlockyConfiguration:
 
         # Fetch existing blocks and allows
         for entry in self.sqlite.fetch("blocklist", limit=0):
-            self.block_list.append(netaddr.IPNetwork(entry["ip"]))
+            block = BlockyBlock(
+                ip=entry["ip"],
+                timestamp=entry["timestamp"],
+                expires=entry["expires"],
+                reason=entry["reason"],
+                host=entry.get("host", "*")
+            )
+            self.block_list.append(block)
+        for entry in DEFAULT_ALLOW_LIST:
+            allow = BlockyAllow(
+                ip=entry,
+                timestamp=0,
+                expires=-1,
+                reason="Default allowed ranges (local network)",
+                host="*",
+            )
+            self.allow_list.append(allow)
         for entry in self.sqlite.fetch("allowlist", limit=0):
-            self.allow_list.append(netaddr.IPNetwork(entry["ip"]))
+            allow = BlockyAllow(
+                ip=entry["ip"],
+                expires=entry["expires"],
+                reason=entry["reason"],
+                host=entry.get("host", "*")
+            )
+            self.allow_list.append(allow)
 
     async def test_es(self):
         i = await self.elasticsearch.info()
