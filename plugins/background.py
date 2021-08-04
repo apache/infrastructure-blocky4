@@ -132,20 +132,20 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                     ignore_ip = False
                     for allowed_ip in config.allow_list:
                         if (
-                            isinstance(allowed_ip, netaddr.IPNetwork)
-                            and off_ip_na in allowed_ip
-                            or isinstance(allowed_ip, netaddr.IPAddress)
-                            and off_ip_na == allowed_ip
+                            isinstance(allowed_ip.network, netaddr.IPNetwork)
+                            and off_ip_na in allowed_ip.network
+                            or isinstance(allowed_ip.network, netaddr.IPAddress)
+                            and off_ip_na == allowed_ip.network
                         ):
                             #  print(f"IP {off_ip} is on the allow list, ignoring...")
                             ignore_ip = True
                             break
                     for blocked_ip in config.block_list:
                         if (
-                            isinstance(blocked_ip, netaddr.IPNetwork)
-                            and off_ip_na in blocked_ip
-                            or isinstance(blocked_ip, netaddr.IPAddress)
-                            and off_ip_na == blocked_ip
+                            isinstance(blocked_ip.network, netaddr.IPNetwork)
+                            and off_ip_na in blocked_ip.network
+                            or isinstance(blocked_ip.network, netaddr.IPAddress)
+                            and off_ip_na == blocked_ip.network
                         ):
                             #  print(f"IP {off_ip} is already blocked, ignoring...")
                             ignore_ip = True
