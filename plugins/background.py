@@ -153,14 +153,25 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                     if not ignore_ip:
                         off_reason = f"{rule['description']} ({off_limit} >= {rule['limit']})"
                         print(f"Found new offender, {off_ip}: {off_reason}")
-                        config.block_list.append(off_ip_na)
+                        now = int(time.time())
+                        expires = now + config.default_expire_seconds
+                        config.block_list.append(
+                            plugins.configuration.BlockyBlock(
+                                ip=off_ip,
+                                timestamp=now,
+                                expires=expires,
+                                reason=off_reason,
+                                host=plugins.configuration.DEFAULT_HOST_BLOCK,
+                            )
+                        )
                         config.sqlite.insert(
                             "blocklist",
                             {
                                 "ip": off_ip,
-                                "timestamp": int(time.time()),
-                                "expires": int(time.time()) + config.default_expire_seconds,
+                                "timestamp": now,
+                                "expires": expires,
                                 "reason": off_reason,
+                                "host": plugins.configuration.DEFAULT_HOST_BLOCK,
                             },
                         )
                         config.sqlite.insert(
