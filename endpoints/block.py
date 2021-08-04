@@ -57,15 +57,15 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
                     "success": False,
                     "status": "failure",
                     "message": f"IP entry {ip} conflicts with block list entry {network.network}. "
-                               "Please address this or use force=true to override.",
+                    "Please address this or use force=true to override.",
                 }
     # If force=true and a conflict was found, remove the conflicting entry
     for entry in to_remove:
         if entry in state.allow_list:
-            state.sqlite.delete("allowlist", ip=entry['ip'])
+            state.sqlite.delete("allowlist", ip=entry["ip"])
             state.allow_list.remove(entry)
         if entry in state.block_list:
-            state.sqlite.delete("blocklist", ip=entry['ip'])
+            state.sqlite.delete("blocklist", ip=entry["ip"])
             state.block_list.remove(entry)
 
     # Now add the block
@@ -79,7 +79,8 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     )
     state.block_list.append(new_block)
     state.sqlite.insert(
-        "blocklist", new_block,
+        "blocklist",
+        new_block,
     )
 
     # Add to audit log
@@ -89,11 +90,7 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     )
 
     # All good!
-    return {
-        "success": True,
-        "status": "blocked",
-        "message": f"IP {ip} added to block list"
-    }
+    return {"success": True, "status": "blocked", "message": f"IP {ip} added to block list"}
 
 
 def register(config: plugins.configuration.BlockyConfiguration):
