@@ -24,12 +24,13 @@ import time
 
 
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
+    now = int(time.time())
     force = formdata.get("force", False)
     ip = formdata.get("ip")
     reason = formdata.get("reason", "no reason specified")
     expires = int(formdata.get("expires", 0))
     if not expires:
-        expires = time.time() + state.default_expire_seconds
+        expires = now + state.default_expire_seconds
     host = formdata.get("host", plugins.configuration.DEFAULT_HOST_BLOCK)
     ip_as_network = netaddr.IPNetwork(ip)
 
@@ -69,7 +70,6 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
             state.block_list.remove(entry)
 
     # Now add the block
-    now = int(time.time())
     new_block = plugins.configuration.BlockyBlock(
         ip=ip,
         timestamp=now,
