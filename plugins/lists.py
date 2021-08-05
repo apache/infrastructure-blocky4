@@ -98,11 +98,9 @@ class List:
                     )
 
         # If force=true and a conflict was found, remove the conflicting entry
-        for entry in to_remove:
-            if entry in self.state.allow_list:
-                self.state.allow_list.remove(entry)
-            if entry in self.state.block_list:
-                self.state.block_list.remove(entry)
+        for d_entry in to_remove:
+            self.state.allow_list.remove(d_entry)
+            self.state.block_list.remove(d_entry)
 
         # Now add the block
         self.list.append(entry)
@@ -127,6 +125,7 @@ class List:
                     break
         # Only try to remove if we have an entry in our list
         if entry and isinstance(entry, IPEntry) and entry in self.list:
+            self.state.sqlite.delete("lists", type=self.type, ip=entry['ip'])
             self.list.remove(entry)
             # Add to audit log
             self.state.sqlite.insert(
