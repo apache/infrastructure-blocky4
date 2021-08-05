@@ -29,23 +29,15 @@ CREATE TABLE "rules" (
 );
 """
 
-CREATE_DB_BANS = """
-CREATE TABLE "blocklist" (
+CREATE_DB_LISTS = """
+CREATE TABLE "lists" (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"type" TEXT NOT NULL,
 	"ip"	TEXT NOT NULL,
 	"reason"	TEXT NOT NULL,
 	"timestamp"	INTEGER NOT NULL,
-	"expires"	INTEGER NOT NULL
-);
-"""
-
-CREATE_DB_ALLOW = """
-CREATE TABLE "allowlist" (
-	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	"ip"	TEXT NOT NULL,
-	"reason"	TEXT NOT NULL,
-	"timestamp"	INTEGER NOT NULL,
-	"expires"	INTEGER NOT NULL
+	"expires"	INTEGER NOT NULL,
+	"host"	TEXT NOT NULL
 );
 """
 
