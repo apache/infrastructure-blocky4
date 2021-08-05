@@ -18,13 +18,13 @@
 import ahapi
 import plugins.configuration
 
-""" Generic block/allow list endpoint for Blocky/4"""
+""" block/allow list viewing endpoint for Blocky/4"""
 
 
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
     return {
-        "block_list": [x for x in state.block_list],
-        "allow_list": [x for x in state.allow_list],
+        "allow": [x for x in state.allow_list],
+        "block": [x for x in state.block_list],
     }
 
 
