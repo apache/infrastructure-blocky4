@@ -23,8 +23,8 @@ import plugins.configuration
 
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
     return {
-        "block_list": state.block_list,
-        "allow_list": state.allow_list,
+        "block_list": [x for x in state.block_list],
+        "allow_list": [x for x in state.allow_list],
     }
 
 
