@@ -44,8 +44,8 @@ class BlockyConfiguration:
         self.index_pattern = yml.get("index_pattern", DEFAULT_INDEX_PATTERN)
         self.elasticsearch_url = yml.get("elasticsearch_url")
         self.elasticsearch = elasticsearch.AsyncElasticsearch(hosts=[self.elasticsearch_url])
-        self.http_ip = yml.get('bind_ip', '127.0.0.1')
-        self.http_port = int(yml.get('bind_port', 8080))
+        self.http_ip = yml.get("bind_ip", "127.0.0.1")
+        self.http_port = int(yml.get("bind_port", 8080))
 
         # Create table if not there yet
         new_db = False
@@ -58,8 +58,8 @@ class BlockyConfiguration:
             new_db = True
 
         # Init and fetch existing blocks and allows
-        self.block_list = plugins.lists.List(self, 'block')
-        self.allow_list = plugins.lists.List(self, 'allow')
+        self.block_list = plugins.lists.List(self, "block")
+        self.allow_list = plugins.lists.List(self, "allow")
 
         # Seed new DB with default allows if needed
         if new_db:
