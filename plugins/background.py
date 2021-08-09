@@ -123,7 +123,7 @@ async def run(config: plugins.configuration.BlockyConfiguration):
     # Search forever, sleep a little in between
     while True:
         # Find expires rules
-        now = time.time() + (5 * 30 * 86400)
+        now = time.time()
         all_items = [item for item in config.sqlite.fetch("lists", limit=0)]
         for item in all_items:
             if item['expires'] == -1:
