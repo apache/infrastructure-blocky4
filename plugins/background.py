@@ -155,29 +155,14 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                         print(f"Found new offender, {off_ip}: {off_reason}")
                         now = int(time.time())
                         expires = now + config.default_expire_seconds
-                        config.block_list.append(
-                            plugins.configuration.BlockyBlock(
-                                ip=off_ip,
-                                timestamp=now,
-                                expires=expires,
-                                reason=off_reason,
-                                host=plugins.configuration.DEFAULT_HOST_BLOCK,
-                            )
+                        config.block_list.add(
+                            ip=off_ip,
+                            timestamp=now,
+                            expires=expires,
+                            reason=off_reason,
+                            host=plugins.configuration.DEFAULT_HOST_BLOCK,
                         )
-                        config.sqlite.insert(
-                            "blocklist",
-                            {
-                                "ip": off_ip,
-                                "timestamp": now,
-                                "expires": expires,
-                                "reason": off_reason,
-                                "host": plugins.configuration.DEFAULT_HOST_BLOCK,
-                            },
-                        )
-                        config.sqlite.insert(
-                            "auditlog",
-                            {"ip": off_ip, "timestamp": int(time.time()), "event": f"Banned IP {off_ip}: {off_reason}"},
-                        )
+
                         # TODO: push_to_pubsub()
         #  TODO: expire outdated bans
         await asyncio.sleep(15)
