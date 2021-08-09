@@ -26,6 +26,8 @@ import time
 import plugins.configuration
 import datetime
 
+MAX_DB_DAYS = 3  # Only look backwards up to three days. No sense in involving every index in our search.
+
 
 async def find_top_clients(
     config: plugins.configuration.BlockyConfiguration,
@@ -46,7 +48,7 @@ async def find_top_clients(
     # Make a list of the past three days' index names:
     d = datetime.datetime.utcnow()
     t = []
-    for i in range(0,3):
+    for i in range(0, MAX_DB_DAYS):
         t.append(d.strftime(config.index_pattern))
         d -= datetime.timedelta(days=1)
     threes = ",".join(t)
@@ -77,7 +79,7 @@ async def find_top_clients(
 
     resp = await config.elasticsearch.search(index=threes, body=q.to_dict(), size=0)
     top_ips = []
-    if 'aggregations' not in resp:
+    if "aggregations" not in resp:
         print(f"Could not find aggregated data. Are you sure the index pattern {config.index_pattern} exists?")
         return []
     for entry in resp["aggregations"]["requests_per_ip"]["buckets"]:
@@ -100,11 +102,11 @@ async def find_top_clients(
 
 class BanRule:
     def __init__(self, ruledict):
-        self.description = ruledict['description']
-        self.aggtype = ruledict['aggtype']
-        self.limit = ruledict['limit']
-        self.duration = ruledict['duration']
-        self.filters = [x.strip() for x in ruledict['filters'].split("\n") if x.strip()]
+        self.description = ruledict["description"]
+        self.aggtype = ruledict["aggtype"]
+        self.limit = ruledict["limit"]
+        self.duration = ruledict["duration"]
+        self.filters = [x.strip() for x in ruledict["filters"].split("\n") if x.strip()]
 
     async def list_offenders(self, config: plugins.configuration.BlockyConfiguration):
         """Find top clients by $metric, see if they cross the limit..."""
@@ -166,4 +168,3 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                         # TODO: push_to_pubsub()
         #  TODO: expire outdated bans
         await asyncio.sleep(15)
-
