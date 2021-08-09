@@ -122,6 +122,21 @@ async def run(config: plugins.configuration.BlockyConfiguration):
 
     # Search forever, sleep a little in between
     while True:
+        # Find expires rules
+        now = time.time() + (5 * 30 * 86400)
+        all_items = [item for item in config.sqlite.fetch("lists", limit=0)]
+        for item in all_items:
+            if item['expires'] == -1:
+                continue  # never expires
+            if item['expires'] < now:
+                print(f"Expiring {item['type']} rule for {item['ip']}")
+                if item['type'] == 'allow':
+                    config.allow_list.remove(item['ip'])
+                elif item['type'] == 'block':
+                    config.block_list.remove(item['ip'])
+                else:
+                    print("I don't actually know items of type {item['type']}, ignoring...")
+
         all_rules = [item for item in config.sqlite.fetch("rules", limit=0)]
         for rule in all_rules:
             #  print(f"Running rule #{rule['id']}: {rule['description']}...")
