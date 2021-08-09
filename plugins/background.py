@@ -122,7 +122,8 @@ async def run(config: plugins.configuration.BlockyConfiguration):
 
     # Search forever, sleep a little in between
     while True:
-        for rule in config.sqlite.fetch("rules", limit=0):
+        all_rules = [item for item in config.sqlite.fetch("rules", limit=0)]
+        for rule in all_rules:
             #  print(f"Running rule #{rule['id']}: {rule['description']}...")
             my_rule = BanRule(rule)
             off = await my_rule.list_offenders(config)
