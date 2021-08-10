@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blocky/4</title>
+  <link rel="stylesheet" href="css/blocky4.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body onload="prime();">
+
+<div id="page">
+    <div id="navbar">
+        <img src="images/shmebulock.png" style="width: 75px; margin: 4px auto; display: block;"/>
+        <hr/>
+        <ul>
+            <li>
+                <i class="fas fa-home icon"></i>
+                Dashboard
+            </li>
+            <li>
+                <i class="fas fa-search icon"></i>
+                Find a Ban
+            </li>
+            <li>
+                <i class="fas fa-plus-square icon"></i>
+                Add Ban
+            </li>
+            <li>
+                <i class="fas fa-pencil-ruler icon"></i>
+                Ban Rules
+            </li>
+            <li>
+                <i class="fas fa-book-dead icon"></i>
+                Allowlist
+            </li>
+            <li>
+                <i class="fas fa-clipboard-list icon"></i>
+                Activity Log
+            </li>
+            <li>
+                <i class="fas fa-ban icon"></i>
+                Fail2ban Search
+            </li>
+        </ul>
+    </div>
+
+    <div id="topbar">
+        <input type="text" onkeyup="if (event.keyCode === 13) {prime_search(this.value);}" placeholder="Search for an IP or username..." style="font-style: italic; font-size: 1rem; width: 20%; border: none; margin: 2px; height: 80%;"> <i class="fas fa-search"></i>
+        Welcome! All our base are belong to you.
+    </div>
+    <div id="main">
+
+    </div>
+</div>
+<footer>
+    Powered by Blocky v/4.
+</footer>
+<script src="js/moment.js" type="text/javascript"></script>
+<script src="js/blocky4.js" type="text/javascript"></script>
+</body>
+</html>
