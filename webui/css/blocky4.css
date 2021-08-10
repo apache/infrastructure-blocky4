@@ -1,0 +1,129 @@
+body, html {
+    background-color: #3f4f5a;
+    background-image: url(../images/background.svg);
+    background-size: cover;
+    font-family: sans-serif;
+}
+
+
+#page {
+    margin: 20px auto;
+    width: 1500px;
+}
+
+#navbar {
+    border-radius: 6px;
+    background-color: #FFF;
+    width: 96px;
+    min-height: 640px;
+    display: inline-block;
+}
+
+#navbar ul {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    position: relative;
+}
+#navbar li {
+    color: #544;
+    position: relative;
+    display: inline-block;
+    height: 72px;
+    width: 96px;
+    padding-top: 8px;
+    font-size: 0.8rem;
+    font-family: sans-serif;
+    border-bottom: 2px solid #3336;
+    vertical-align: middle;
+}
+
+#navbar li:last-child {
+    border-bottom: none;
+}
+
+#navbar li:hover {
+    color: #833;
+    cursor: pointer;
+}
+
+
+.icon {
+    font-size: 1.8rem;
+    padding-bottom: 8px;
+    display: block;
+    width: 100%;
+}
+
+#topbar {
+    border-radius: 6px;
+    width: 1200px;
+    height: 48px;
+    background-color: #FFF;
+    display: inline-block;
+    position: absolute;
+    top: 20px;
+    margin-left: 40px;
+}
+
+#main {
+    border-radius: 6px;
+    width: 1200px;
+    min-height: 600px;
+    background-color: #FFF;
+    display: inline-block;
+    margin-left: 40px;
+    position: absolute;
+    top: 92px;
+}
+
+h1 {
+    width: calc(100% - 20px);
+    font-size: 1.25rem;
+    padding: 10px;
+    font-weight: normal;
+    font-family: sans-serif;
+    background-color: #777066;
+    color: #FFF;
+}
+
+table {
+    font-family: sans-serif;
+    font-size: 0.9rem;
+    /*background: #524b41;*/
+    width: 100%;
+}
+
+th {
+    background-color: #524b41;
+    color: #fff;
+}
+tr:nth-child(odd)>td {
+    background-color: #f9f9f9;
+    padding: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin: 0;
+}
+
+
+tr:nth-child(even)>td {
+    background-color: #EEE;
+    padding: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin: 0;
+}
+
+td:nth-child(3) {
+    width: 500px;
+}
+
+footer {
+    text-align: center;
+    width: 1500px;
+    margin: auto;
+    font-family: sans-serif;
+    font-size: 0.8rem;
+    color: #bbb;
+}
