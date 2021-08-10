@@ -19,26 +19,33 @@ import ahapi
 import plugins.configuration
 import time
 
-""" Generic add-allow endpoint for Blocky/4"""
+""" Generic add/remove-allow endpoint for Blocky/4"""
 
 
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
     now = int(time.time())
     force = formdata.get("force", False)
     ip = formdata.get("ip")
-    reason = formdata.get("reason", "no reason specified")
-    expires = int(formdata.get("expires", -1))  # Different from block. We generally wish to allow forever, so -1 here.
-    if not expires:
-        expires = now + state.default_expire_seconds
-    host = formdata.get("host", plugins.configuration.DEFAULT_HOST_BLOCK)
+    if request.method in ["PUT", "POST"]:
+        reason = formdata.get("reason", "no reason specified")
+        expires = int(formdata.get("expires", -1))  # Different from block. We generally wish to allow forever, so -1 here.
+        if not expires:
+            expires = now + state.default_expire_seconds
+        host = formdata.get("host", plugins.configuration.DEFAULT_HOST_BLOCK)
 
-    try:
-        state.allow_list.add(ip=ip, expires=expires, reason=reason, host=host, force=force)
-    except plugins.lists.BlockListException as e:
-        return {"success": False, "status": "failure", "message": str(e)}
+        try:
+            state.allow_list.add(ip=ip, expires=expires, reason=reason, host=host, force=force)
+        except plugins.lists.BlockListException as e:
+            return {"success": False, "status": "failure", "message": str(e)}
 
-    # All good!
-    return {"success": True, "status": "allowed", "message": f"IP {ip} added to allow list"}
+        # All good!
+        return {"success": True, "status": "allowed", "message": f"IP {ip} added to allow list"}
+    elif request.method == "DELETE":
+        for entry in state.allow_list:
+            if entry['ip'] == ip:
+                state.allow_list.remove(entry)
+                return {"success": True, "status": "removed", "message": f"IP {ip} removed from allow list"}
+        return {"success": False, "status": "not found", "message": f"IP {ip} does not exist in the allow list"}
 
 
 def register(config: plugins.configuration.BlockyConfiguration):
