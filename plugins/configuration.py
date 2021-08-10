@@ -46,6 +46,7 @@ class BlockyConfiguration:
         self.elasticsearch = elasticsearch.AsyncElasticsearch(hosts=[self.elasticsearch_url])
         self.http_ip = yml.get("bind_ip", "127.0.0.1")
         self.http_port = int(yml.get("bind_port", 8080))
+        self.client_iptables = {}  # Uploaded iptables from blocky clients. Only kept in memory.
 
         # Create table if not there yet
         new_db = False
