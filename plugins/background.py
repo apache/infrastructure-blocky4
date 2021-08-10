@@ -33,7 +33,7 @@ async def find_top_clients(
     config: plugins.configuration.BlockyConfiguration,
     aggtype: typing.Literal["bytes", "requests"] = "requests",
     duration: str = "12h",
-    no_hits: int = 100,
+    no_hits: int = 250,
     filters: typing.List[str] = [],
 ) -> typing.List[typing.Tuple[str, int]]:
     """Finds the top clients (IPs) in the database based on the parameters provided.
@@ -41,6 +41,8 @@ async def find_top_clients(
     assert aggtype in ["bytes", "requests"], "Only by-bytes or by-requests aggregations are supported"
     if isinstance(filters, str):
         filters = [filters]
+    elif filters is None:
+        filters = []
 
     q = elasticsearch_dsl.Search(using=config.elasticsearch)
     q = q.filter("range", timestamp={"gte": f"now-{duration}"})
@@ -111,7 +113,11 @@ class BanRule:
     async def list_offenders(self, config: plugins.configuration.BlockyConfiguration):
         """Find top clients by $metric, see if they cross the limit..."""
         offenders = []
-        candidates = await find_top_clients(config, aggtype=self.aggtype, duration=self.duration, filters=self.filters)
+        try:
+            candidates = await find_top_clients(config, aggtype=self.aggtype, duration=self.duration, filters=self.filters)
+        except asyncio.exceptions.TimeoutError:
+            print("Offender search timed out, retrying later!")
+            candidates = []
         for candidate in candidates:
             if candidate[1] >= self.limit:
                 offenders.append(candidate)
