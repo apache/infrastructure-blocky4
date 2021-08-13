@@ -38,12 +38,17 @@ body, html {
     vertical-align: middle;
 }
 
+#navbar li a {
+    text-decoration: none;
+    color: #544;
+}
+
 #navbar li:last-child {
     border-bottom: none;
 }
 
-#navbar li:hover {
-    color: #833;
+#navbar li a:hover {
+    color: #833 !important;
     cursor: pointer;
 }
 
