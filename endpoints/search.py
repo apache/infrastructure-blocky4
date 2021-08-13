@@ -52,6 +52,8 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
                     x_rule = dict(rule)
                     del x_rule["as_net"]  # Can't serialize
                     results["iptables"].append(x_rule)
+                    if len(results["iptables"]) >= MAX_IPTABLES_RECORDS:
+                        break
         if len(results["iptables"]) >= MAX_IPTABLES_RECORDS:
             break
 
