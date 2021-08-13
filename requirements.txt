@@ -3,4 +3,4 @@ aiohttp
 elasticsearch==7.13.0
 netaddr
 pyyaml
-ahapi==0.1.7
+ahapi==0.1.8
