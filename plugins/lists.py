@@ -19,6 +19,8 @@ import netaddr
 import time
 import plugins.configuration
 import typing
+import aiohttp
+import asyncio
 
 """ Block- and Allow-list handlers """
 
@@ -47,7 +49,7 @@ class List:
             self.list.append(
                 IPEntry(
                     ip=entry["ip"],
-                    timestamp=0,
+                    timestamp=entry["timestamp"],
                     expires=entry["expires"],
                     reason=entry["reason"],
                     host=entry.get("host", "*"),
@@ -115,6 +117,27 @@ class List:
             "auditlog",
             {"ip": ip, "timestamp": int(time.time()), "event": f"IP {ip} added to the {self.type} list: {reason}"},
         )
+
+        # Add pubsubbing to the main loop
+        if self.state.pubsub_host:
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.pubsub(entry))
+
+    async def pubsub(self, entry):
+        js = {
+            self.type: entry
+        }
+        api_url = f"{self.state.pubsub_host}/blocky/{self.type}"
+        try:
+            auth = None
+            if self.state.pubsub_user:
+                auth = aiohttp.BasicAuth(self.state.pubsub_user, self.state.pubsub_password)
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.request("POST", api_url, json=js, timeout=timeout, auth=auth) as resp:
+                response = await resp.text()
+                assert resp.status == 202, f"pyPubSub responded: {response}"
+        except Exception as e:
+            print(f"Could not send payload to {api_url}: {e}")
 
     def remove(self, entry: typing.Union[str, IPEntry]):
         """Removes an IP/CIDR from the list"""
