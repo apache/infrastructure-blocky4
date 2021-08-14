@@ -24,6 +24,7 @@ import typing
 import netaddr
 import time
 import plugins.configuration
+import plugins.lists
 import datetime
 
 MAX_DB_DAYS = 3  # Only look backwards up to three days. No sense in involving every index in our search.
@@ -51,9 +52,14 @@ async def find_top_clients(
     d = datetime.datetime.utcnow()
     t = []
     for i in range(0, MAX_DB_DAYS):
-        t.append(d.strftime(config.index_pattern))
-        d -= datetime.timedelta(days=1)
+        index_name = d.strftime(config.index_pattern)
+        has_index = await config.elasticsearch.indices.exists(index=index_name)
+        if has_index:
+            t.append(index_name)
+            d -= datetime.timedelta(days=1)
     threes = ",".join(t)
+    if not threes:
+        return []
 
     # Add all search filters
     for entry in filters:
@@ -128,8 +134,8 @@ async def run(config: plugins.configuration.BlockyConfiguration):
 
     # Search forever, sleep a little in between
     while True:
-        # Find expires rules
-        now = time.time()
+        # Find expired rules
+        now = int(time.time())
         all_items = [item for item in config.sqlite.fetch("lists", limit=0)]
         for item in all_items:
             if item['expires'] == -1:
@@ -140,6 +146,18 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                     config.allow_list.remove(item['ip'])
                 elif item['type'] == 'block':
                     config.block_list.remove(item['ip'])
+                    # Try adding a temporary whitelist entry to flush on hosts
+                    try:
+                        config.allow_list.add(
+                            ip=item["ip"],
+                            timestamp=now,
+                            expires=now + 600,  # Expire this rule in 10 minutes
+                            reason="Temporary allow-listed by BLocky4 to unblock IP due to block expiring",
+                            host=plugins.configuration.DEFAULT_HOST_BLOCK,
+                            force=False
+                        )
+                    except plugins.lists.BlockListException:
+                        pass  # If it conflicts, it should already be unblocked, so we don't care.
                 else:
                     print("I don't actually know items of type {item['type']}, ignoring...")
 
@@ -187,6 +205,4 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                             host=plugins.configuration.DEFAULT_HOST_BLOCK,
                         )
 
-                        # TODO: push_to_pubsub()
-        #  TODO: expire outdated bans
         await asyncio.sleep(15)
