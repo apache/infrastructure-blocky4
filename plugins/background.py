@@ -20,6 +20,7 @@
 
 import asyncio
 import elasticsearch_dsl
+import elasticsearch
 import typing
 import netaddr
 import time
@@ -28,13 +29,15 @@ import plugins.lists
 import datetime
 
 MAX_DB_DAYS = 3  # Only look backwards up to three days. No sense in involving every index in our search.
+CLIENT_IP_NAME = "clientip"
+TIMESTAMP_NAME = "@timestamp"
 
 
 async def find_top_clients(
     config: plugins.configuration.BlockyConfiguration,
     aggtype: typing.Literal["bytes", "requests"] = "requests",
     duration: str = "12h",
-    no_hits: int = 250,
+    no_hits: int = 100,
     filters: typing.List[str] = [],
 ) -> typing.List[typing.Tuple[str, int]]:
     """Finds the top clients (IPs) in the database based on the parameters provided.
@@ -46,7 +49,7 @@ async def find_top_clients(
         filters = []
 
     q = elasticsearch_dsl.Search(using=config.elasticsearch)
-    q = q.filter("range", timestamp={"gte": f"now-{duration}"})
+    q = q.filter("range", **{TIMESTAMP_NAME: {"gte": f"now-{duration}"}})
 
     # Make a list of the past three days' index names:
     d = datetime.datetime.utcnow()
@@ -78,18 +81,19 @@ async def find_top_clients(
             else:
                 raise TypeError(f"Unknown operator {o} in search filter: {entry}")
     if aggtype == "requests":
-        q.aggs.bucket("requests_per_ip", elasticsearch_dsl.A("terms", field="client_ip.keyword", size=no_hits))
+        q.aggs.bucket("requests_per_ip", elasticsearch_dsl.A("terms", field=f"{CLIENT_IP_NAME}.keyword", size=no_hits))
     elif aggtype == "bytes":
         q.aggs.bucket(
             "requests_per_ip",
-            elasticsearch_dsl.A("terms", field="client_ip.keyword", size=no_hits, order={"bytes_sum": "desc"}),
+            elasticsearch_dsl.A("terms", field=f"{CLIENT_IP_NAME}.keyword", size=no_hits, order={"bytes_sum": "desc"}),
         ).metric("bytes_sum", "sum", field="bytes")
 
-    resp = await config.elasticsearch.search(index=threes, body=q.to_dict(), size=0)
+    resp = await config.elasticsearch.search(index=threes, body=q.to_dict(), size=0, timeout="30s")
     top_ips = []
     if "aggregations" not in resp:
         print(f"Could not find aggregated data. Are you sure the index pattern {config.index_pattern} exists?")
         return []
+
     for entry in resp["aggregations"]["requests_per_ip"]["buckets"]:
         if "bytes_sum" in entry:
             top_ips.append(
@@ -121,7 +125,7 @@ class BanRule:
         offenders = []
         try:
             candidates = await find_top_clients(config, aggtype=self.aggtype, duration=self.duration, filters=self.filters)
-        except asyncio.exceptions.TimeoutError:
+        except (asyncio.exceptions.TimeoutError, elasticsearch.exceptions.ConnectionTimeout):
             print("Offender search timed out, retrying later!")
             candidates = []
         for candidate in candidates:
@@ -204,5 +208,4 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                             reason=off_reason,
                             host=plugins.configuration.DEFAULT_HOST_BLOCK,
                         )
-
         await asyncio.sleep(15)
