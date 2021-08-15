@@ -4,5 +4,5 @@ elasticsearch==7.13.0
 elasticsearch_dsl==7.3.0
 netaddr
 pyyaml
-ahapi==0.1.10
+ahapi==0.1.11
 asfpy
