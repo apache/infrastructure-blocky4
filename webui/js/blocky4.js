@@ -161,16 +161,21 @@ async function prime_search(target, state) {
     }
     let main = document.getElementById('main');
     main.innerHTML = '';
-    let title = _h1("Search results for " + target + ":");
-    main.appendChild(title);
-    let p = _p("Searching, please wait...");
-    main.appendChild(p);
-
-    let results = {};
     if (target && target.length > 0) {
-        results = await POST('search', {source: target});
-        main.removeChild(p);
+        let title = _h1("Search results for " + target + ":");
+        main.appendChild(title);
 
+        let p = _p("Searching, please wait...");
+        main.appendChild(p);
+
+        let results = await POST('search', {source: target});
+
+        if (results.success === false) {
+            p.innerText = results.message;
+            return
+        }
+
+        main.removeChild(p);
 
         // Allow list results
         let h2 = _h2(`Allow list results (${results.allow.length})`);
@@ -306,7 +311,9 @@ async function prime_search(target, state) {
         }
 
     } else {
-        main.innerText = "Use the search bar in the top left corner for now...";
+        //let x = await sleep(10);
+        let p = _p("Use the search bar in the top left corner for now...");
+        main.appendChild(p);
     }
 
 }
