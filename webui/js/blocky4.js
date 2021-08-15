@@ -477,10 +477,11 @@ async function prime_rules(target, state) {
 
 async function save_allow() {
     let ip = document.getElementById('add_source').value;
-    let expiry = document.getElementById('add_expiry').value;
+    let expiry = parseInt(document.getElementById('add_expiry').value);
     let reason = document.getElementById('add_reason').value;
     let host = document.getElementById('add_host').value;
-    let true_expiry = parseInt(new Date().getTime() / 1000) + parseInt(expiry);
+    let true_expiry = parseInt(new Date().getTime() / 1000) + expiry;
+    if (expiry == -1) true_expiry = -1;
 
     let result = await PUT('allow', {
         ip: ip,
