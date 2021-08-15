@@ -636,9 +636,118 @@ async function prime_allow() {
 }
 
 
+
+async function save_block() {
+    let ip = document.getElementById('add_source').value;
+    let expiry = parseInt(document.getElementById('add_expiry').value);
+    let reason = document.getElementById('add_reason').value;
+    let host = document.getElementById('add_host').value;
+    let true_expiry = parseInt(new Date().getTime() / 1000) + expiry;
+    if (expiry == -1) true_expiry = -1;
+
+    let result = await PUT('block', {
+        ip: ip,
+        host: host,
+        reason: reason,
+        expires: true_expiry
+    });
+    alert(result.message);
+    if (result.success === true) location.reload();
+}
+
+
+
+async function prime_block() {
+    let all = await GET("all");
+    let main = document.getElementById('main');
+    main.innerHTML = "";
+
+    let h2 = _h1("Add a block rule:");
+    main.appendChild(h2);
+
+
+    // Add an entry
+    let add_table = _table();
+    add_table.style.tableLayout = 'fixed';
+    main.appendChild(add_table);
+    let atheader = _tr();
+    atheader.appendChild(_th('Source IP', 300));
+    atheader.appendChild(_th('Expiry', 120));
+    atheader.appendChild(_th('Reason', 500));
+    atheader.appendChild(_th('Host', 100));
+    atheader.appendChild(_th(' ', 100));
+    add_table.appendChild(atheader);
+
+    let add_tr = _tr();
+
+    // source ip
+    let add_source = _td();
+    let add_source_input = document.createElement('input');
+    add_source_input.placeholder = "CIDR, e.g. 127.0.0.1/32 or 2001:dead:beef::1"
+    add_source_input.style.width = "95%";
+    add_source_input.id = "add_source"
+    add_source.appendChild(add_source_input);
+    add_tr.appendChild(add_source);
+
+    // expiry
+    let add_expiry = _td();
+    let add_expiry_input = document.createElement('select');
+    add_expiry_input.id = "add_expiry";
+    let options = {
+        "1 hour": 3600,
+        "2 hours": 7200,
+        "12 hours": 43200,
+        "24 hours": 86400,
+        "7 days": 604800,
+        "never": -1
+    }
+    for (let key in options) {
+        let x_opt = document.createElement('option');
+        x_opt.value = options[key];
+        x_opt.text = key;
+        add_expiry_input.appendChild(x_opt);
+    }
+    add_expiry.appendChild(add_expiry_input);
+    add_tr.appendChild(add_expiry);
+
+    // Reason
+    let add_reason = _td();
+    let add_reason_input = document.createElement('input');
+    add_reason_input.placeholder = "Enter a reason for allowing this IP/block."
+    add_reason_input.style.width = "95%";
+    add_reason_input.id = "add_reason";
+    add_reason.appendChild(add_reason_input);
+    add_tr.appendChild(add_reason);
+
+    // Host
+    let add_host = _td();
+    let add_host_input = document.createElement('input');
+    add_host_input.placeholder = "* or foo.apache.org";
+    add_host_input.value = "*";
+    add_host_input.style.width = "95%";
+    add_host_input.id = "add_host";
+    add_host.appendChild(add_host_input);
+    add_tr.appendChild(add_host);
+
+    // Save button
+    let add_save = _td();
+    let add_save_button = document.createElement('button');
+    add_save_button.innerText = "Add block rule";
+    add_save_button.addEventListener('click', () => save_block());
+    add_save.appendChild(add_save_button);
+    add_tr.appendChild(add_save);
+
+
+    add_table.appendChild(add_tr);
+    main.appendChild(_hr());
+}
+
+
+
 let actions = {
     frontpage: prime_frontpage,
     allow: prime_allow,
+    add: prime_block,
     search: prime_search,
     rules: prime_rules
 };
