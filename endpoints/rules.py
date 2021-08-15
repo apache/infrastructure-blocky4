@@ -58,19 +58,26 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
 
     # Adding a rule?
     if request.method == "PUT":
-        description = formdata.get("description")
-        assert description, "Please provide a description for your new rule"
-        aggtype = formdata.get("aggtype")
-        assert aggtype in ["requests", "bytes"], "aggtype must be either requests or bytes"
-        limit = int(formdata.get("limit"))
-        assert limit > 0, "limit must be greater than zero"
-        duration = formdata.get("duration")
-        assert re.match(r"^\d+[dhms]", duration), "duration must be of format 0-99[d/h/m/s], for instance 24h or 45m"
-        filters = formdata.get("filter", "")
         try:
-            validate_filter(filters)
-        except TypeError as e:
-            assert AssertionError(e)
+            description = formdata.get("description")
+            assert description, "Please provide a description for your new rule"
+            aggtype = formdata.get("aggtype")
+            assert aggtype in ["requests", "bytes"], "aggtype must be either requests or bytes"
+            limit = int(formdata.get("limit"))
+            assert limit > 0, "limit must be greater than zero"
+            duration = formdata.get("duration")
+            assert re.match(r"^\d+[dhms]", duration), "duration must be of format 0-99[d/h/m/s], for instance 24h or 45m"
+            filters = formdata.get("filter", "")
+            try:
+                validate_filter(filters)
+            except TypeError as e:
+                raise AssertionError(e)
+        except AssertionError as e:
+            return {
+                "success": False,
+                "status": "assertion error",
+                "message": str(e),
+            }
         entry = {
             "description": description,
             "aggtype": aggtype,
@@ -94,20 +101,27 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
 
     # Patching a rule?
     if request.method == "PATCH":
-        rule_id = int(formdata.get("rule", -1))
-        description = formdata.get("description")
-        assert description, "Please provide a description for your new rule"
-        aggtype = formdata.get("aggtype")
-        assert aggtype in ["requests", "bytes"], "aggtype must be either requests or bytes"
-        limit = int(formdata.get("limit"))
-        assert limit > 0, "limit must be greater than zero"
-        duration = formdata.get("duration")
-        assert re.match(r"^\d+[dhms]", duration), "duration must be of format 0-99[d/h/m/s], for instance 24h or 45m"
-        filters = formdata.get("filter", "")
         try:
-            validate_filter(filters)
-        except TypeError as e:
-            assert AssertionError(e)
+            rule_id = int(formdata.get("rule", -1))
+            description = formdata.get("description")
+            assert description, "Please provide a description for your new rule"
+            aggtype = formdata.get("aggtype")
+            assert aggtype in ["requests", "bytes"], "aggtype must be either requests or bytes"
+            limit = int(formdata.get("limit"))
+            assert limit > 0, "limit must be greater than zero"
+            duration = formdata.get("duration")
+            assert re.match(r"^\d+[dhms]", duration), "duration must be of format 0-99[d/h/m/s], for instance 24h or 45m"
+            filters = formdata.get("filter", "")
+            try:
+                validate_filter(filters)
+            except TypeError as e:
+                raise AssertionError(e)
+        except AssertionError as e:
+            return {
+                "success": False,
+                "status": "assertion error",
+                "message": str(e),
+            }
         entry = {
             "description": description,
             "aggtype": aggtype,
