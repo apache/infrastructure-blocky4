@@ -11,18 +11,11 @@
 <div id="page">
     <div id="navbar">
         <img src="images/shmebulock.png" style="width: 75px; margin: 4px auto; display: block;"/>
-        <hr/>
         <ul>
             <li>
                 <a href=".">
                 <i class="fas fa-home icon"></i>
                 Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="?search">
-                <i class="fas fa-search icon"></i>
-                Find a Ban
                 </a>
             </li>
             <li>
@@ -52,12 +45,15 @@
         </ul>
     </div>
 
-    <div id="topbar">
-        <input type="text" onkeyup="if (event.keyCode === 13) {prime_search(this.value);}" placeholder="Search for an IP or username..." style="font-style: italic; font-size: 1rem; width: 20%; border: none; margin: 2px; height: 80%;"> <i class="fas fa-search"></i>
-        Welcome! All our base are belong to you.
-    </div>
-    <div id="main">
-
+    <div id="wrapper">
+        <div>
+            <div id="topbar">
+            <input type="text" onkeyup="if (event.keyCode === 13) {prime_search(this.value);}" placeholder="Search for an IP or username..."> <i class="fas fa-search"></i>
+            Welcome! All our base are belong to you.<br/>
+            </div>
+            <div id="main">
+            </div>
+        </div>
     </div>
 </div>
 <footer>
