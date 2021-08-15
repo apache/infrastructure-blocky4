@@ -34,7 +34,7 @@ async def main(loop: asyncio.BaseEventLoop):
         bind_ip=config.http_ip,
         bind_port=config.http_port,
         state=config,
-        max_upload=2 * 1024 * 1024,
+        max_upload=4 * 1024 * 1024,  # 4MB ≃ 20,000 iptables entries from a client
     )
     loop.create_task(httpserver.loop())
     while True:
