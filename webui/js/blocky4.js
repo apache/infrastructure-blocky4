@@ -312,7 +312,7 @@ async function prime_search(target, state) {
 }
 
 function unblock_iptables_link(entry) {
-    let link = _a('Unblock');
+    let link = _a('Soft Unblock');
     let _entry = entry;
     _entry.ip = _entry.source;
     link.setAttribute("href", 'javascript:void(0);');
