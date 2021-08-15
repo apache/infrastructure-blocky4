@@ -52,8 +52,53 @@ let _tr = () => htmlobj('tr');
 let _td = (title) => htmlobj('td', title);
 let _th = (title, width) => { let obj = htmlobj('th', title); if (width) obj.style.width = width + "px"; return obj }
 let _table = () => htmlobj('table');
+let _a = (txt) => htmlobj('a', txt);
 
 
+async function unblock_ip(_entry) {
+    if (confirm(`This will unblock ${_entry.ip} and add it to the allow-list for 10 minutes. Continue?`)) {
+        result = await POST('allow', {
+            ip: _entry.ip,
+            reason: "Temporarily allow-listed for 10 minutes to unblock IP",
+            expires: parseInt(new Date().getTime()/1000) + 600,
+            force: true
+        })
+        if (result.success === true) {
+            alert("IP Unblocked. Please allow for a few moments for it to apply across the servers.");
+            location.reload();
+        } else {
+            alert(result.message);
+        }
+    }
+    return false;
+}
+
+
+async function remove_allow(_entry) {
+    if (confirm(`This will remove ${_entry.ip} from the allow list. Continue?`)) {
+        result = await DELETE('allow', {
+            ip: _entry.ip,
+            force: true
+        })
+        if (result.success === true) {
+            alert("IP Removed from allow-list.");
+            location.reload();
+        } else {
+            alert(result.message);
+        }
+    }
+    return false;
+}
+
+
+function unblock_link(entry, allowlist=false) {
+    let link = _a(allowlist ? 'Remove' : 'Unblock');
+    let _entry = entry;
+    link.setAttribute("href", 'javascript:void(0);');
+    if (allowlist === true) { link.addEventListener('click', () => remove_allow(_entry)); }
+    else {link.addEventListener('click', () => unblock_ip(_entry));}
+    return link;
+}
 
 async function prime_frontpage() {
     let all = await GET("all");
@@ -88,6 +133,7 @@ async function prime_frontpage() {
         let td_expires = _td(entry.expires > 0 ? moment(entry.expires*1000.0).fromNow() : 'Never');
         let td_reason = _td(entry.reason);
         let td_action = _td();
+        td_action.appendChild(unblock_link(entry));
         tr.appendChild(td_ip);
         tr.appendChild(td_added);
         tr.appendChild(td_expires);
@@ -95,7 +141,7 @@ async function prime_frontpage() {
         tr.appendChild(td_action);
         activity_table.appendChild(tr);
         results_shown++;
-        if (results_shown > 25 && results.block.length > 25) {
+        if (results_shown > 25 && all.block.length > 25) {
             break
         }
     }
@@ -150,6 +196,7 @@ async function prime_search(target, state) {
             let td_expires = _td(entry.expires > 0 ? moment(entry.expires * 1000.0).fromNow() : 'Never');
             let td_reason = _td(entry.reason);
             let td_action = _td();
+            td_action.appendChild(unblock_link(entry, true));
             td_ip.style.fontFamily = "monospace";
             if (entry.ip.length > 16) td_ip.style.fontSize = "0.8rem";
             tr.appendChild(td_ip);
@@ -193,6 +240,7 @@ async function prime_search(target, state) {
             let td_expires = _td(entry.expires > 0 ? moment(entry.expires * 1000.0).fromNow() : 'Never');
             let td_reason = _td(entry.reason);
             let td_actions = _td('');
+            td_actions.appendChild(unblock_link(entry));
             td_ip.style.fontFamily = "monospace";
             if (entry.ip.length > 16) td_ip.style.fontSize = "0.8rem";
             tr.appendChild(td_ip);
