@@ -492,13 +492,15 @@ async function save_allow() {
     let reason = document.getElementById('add_reason').value;
     let host = document.getElementById('add_host').value;
     let true_expiry = parseInt(new Date().getTime() / 1000) + expiry;
+    let force = document.getElementById('add_force').checked ? true : false;
     if (expiry == -1) true_expiry = -1;
 
     let result = await PUT('allow', {
         ip: ip,
         host: host,
         reason: reason,
-        expires: true_expiry
+        expires: true_expiry,
+        force: force
     });
     alert(result.message);
     if (result.success === true) location.reload();
@@ -525,6 +527,7 @@ async function prime_allow() {
     atheader.appendChild(_th('Expiry', 120));
     atheader.appendChild(_th('Reason', 500));
     atheader.appendChild(_th('Host', 100));
+    atheader.appendChild(_th('Force', 60));
     atheader.appendChild(_th(' ', 100));
     add_table.appendChild(atheader);
 
@@ -579,6 +582,15 @@ async function prime_allow() {
     add_host_input.id = "add_host";
     add_host.appendChild(add_host_input);
     add_tr.appendChild(add_host);
+
+    // Force
+    let add_force = _td();
+    let add_force_input = document.createElement('input');
+    add_force_input.setAttribute('type', 'checkbox');
+    add_force_input.setAttribute('value', 'true');
+    add_force_input.id = 'add_force';
+    add_force.appendChild(add_force_input);
+    add_tr.appendChild(add_force);
 
     // Save button
     let add_save = _td();
