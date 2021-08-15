@@ -442,15 +442,16 @@ async function prime_rules(target, state) {
     main.appendChild(title);
 
     let t = _table();
+    t.style.tableLayout = 'fixed';
     main.appendChild(t);
 
     let btheader = _tr();
     btheader.appendChild(_th('Description', 500));
-    btheader.appendChild(_th('Aggregation Type', 120));
-    btheader.appendChild(_th('Limit', 120));
+    btheader.appendChild(_th('Aggregation Type', 160));
+    btheader.appendChild(_th('Limit', 140));
     btheader.appendChild(_th('Timespan', 80));
-    btheader.appendChild(_th('Filters', 300));
-    btheader.appendChild(_th('Actions', 200));
+    btheader.appendChild(_th('Filters', 360));
+    btheader.appendChild(_th('Actions', 150));
     t.appendChild(btheader);
 
     let rules = await GET('rules');
