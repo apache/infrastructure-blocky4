@@ -475,9 +475,169 @@ async function prime_rules(target, state) {
 
 }
 
+async function save_allow() {
+    let ip = document.getElementById('add_source').value;
+    let expiry = document.getElementById('add_expiry').value;
+    let reason = document.getElementById('add_reason').value;
+    let host = document.getElementById('add_host').value;
+    let true_expiry = parseInt(new Date().getTime() / 1000) + parseInt(expiry);
+
+    let result = await PUT('allow', {
+        ip: ip,
+        host: host,
+        reason: reason,
+        expires: true_expiry
+    });
+    alert(result.message);
+    if (result.success === true) location.reload();
+}
+
+
+
+
+async function prime_allow() {
+    let all = await GET("all");
+    let main = document.getElementById('main');
+    main.innerHTML = "";
+
+    let h2 = _h2("Add an allow rule:");
+    main.appendChild(h2);
+
+
+    // Add an entry
+    let add_table = _table();
+    add_table.style.tableLayout = 'fixed';
+    main.appendChild(add_table);
+    let atheader = _tr();
+    atheader.appendChild(_th('Source IP', 300));
+    atheader.appendChild(_th('Expiry', 120));
+    atheader.appendChild(_th('Reason', 500));
+    atheader.appendChild(_th('Host', 100));
+    atheader.appendChild(_th(' ', 100));
+    add_table.appendChild(atheader);
+
+    let add_tr = _tr();
+
+    // source ip
+    let add_source = _td();
+    let add_source_input = document.createElement('input');
+    add_source_input.placeholder = "CIDR, e.g. 127.0.0.1/32 or 2001:dead:beef::1"
+    add_source_input.style.width = "95%";
+    add_source_input.id = "add_source"
+    add_source.appendChild(add_source_input);
+    add_tr.appendChild(add_source);
+
+    // expiry
+    let add_expiry = _td();
+    let add_expiry_input = document.createElement('select');
+    add_expiry_input.id = "add_expiry";
+    let options = {
+        "1 hour": 3600,
+        "2 hours": 7200,
+        "12 hours": 43200,
+        "24 hours": 86400,
+        "7 days": 604800,
+        "never": -1
+    }
+    for (let key in options) {
+        let x_opt = document.createElement('option');
+        x_opt.value = options[key];
+        x_opt.text = key;
+        add_expiry_input.appendChild(x_opt);
+    }
+    add_expiry.appendChild(add_expiry_input);
+    add_tr.appendChild(add_expiry);
+
+    // Reason
+    let add_reason = _td();
+    let add_reason_input = document.createElement('input');
+    add_reason_input.placeholder = "Enter a reason for allowing this IP/block."
+    add_reason_input.style.width = "95%";
+    add_reason_input.id = "add_reason";
+    add_reason.appendChild(add_reason_input);
+    add_tr.appendChild(add_reason);
+
+    // Host
+    let add_host = _td();
+    let add_host_input = document.createElement('input');
+    add_host_input.placeholder = "* or foo.apache.org";
+    add_host_input.value = "*";
+    add_host_input.style.width = "95%";
+    add_host_input.id = "add_host";
+    add_host.appendChild(add_host_input);
+    add_tr.appendChild(add_host);
+
+    // Save button
+    let add_save = _td();
+    let add_save_button = document.createElement('button');
+    add_save_button.innerText = "Add allow rule";
+    add_save_button.addEventListener('click', () => save_allow());
+    add_save.appendChild(add_save_button);
+    add_tr.appendChild(add_save);
+
+
+    add_table.appendChild(add_tr);
+    main.appendChild(_hr());
+
+
+    let allow_count = all.allow.length.pretty();
+    let h1 = _h1(`Allowed IPs (${allow_count} blocks in total)`);
+    main.appendChild(h1);
+    all.allow.sort((a,b) => b.timestamp - a.timestamp);  // sort desc by timestamp
+
+
+    // Current entries in allow list
+    let activity_table = _table();
+    activity_table.style.tableLayout = 'fixed';
+    main.appendChild(activity_table);
+
+    let theader = _tr();
+    theader.appendChild(_th('Source IP', 300));
+    theader.appendChild(_th('Added', 120));
+    theader.appendChild(_th('Expires', 120));
+    theader.appendChild(_th('Reason', 500));
+    theader.appendChild(_th('Host', 100));
+    theader.appendChild(_th('Actions', 100));
+    activity_table.appendChild(theader);
+
+    let results_shown = 0;
+    for (const entry of all.allow) {
+        let tr = _tr();
+        let td_ip = _td(entry.ip);
+        td_ip.style.fontFamily = "monospace";
+        if (entry.ip.length > 16) td_ip.style.fontSize = "0.8rem";
+        let td_added = _td(moment(entry.timestamp*1000.0).fromNow());
+        let td_expires = _td(entry.expires > 0 ? moment(entry.expires*1000.0).fromNow() : 'Never');
+        let td_reason = _td(entry.reason);
+        let td_host = _td(entry.host);
+        let td_action = _td();
+        td_action.appendChild(unblock_link(entry, true));
+        tr.appendChild(td_ip);
+        tr.appendChild(td_added);
+        tr.appendChild(td_expires);
+        tr.appendChild(td_reason);
+        tr.appendChild(td_host);
+        tr.appendChild(td_action);
+        activity_table.appendChild(tr);
+        results_shown++;
+        if (results_shown > 25 && all.block.length > 25) {
+            break
+        }
+    }
+    if (results_shown === 0) {
+        let tr = _tr();
+        tr.innerText = "No activity found...";
+        activity_table.appendChild(_tr);
+    }
+
+
+
+}
+
 
 let actions = {
     frontpage: prime_frontpage,
+    allow: prime_allow,
     search: prime_search,
     rules: prime_rules
 };
