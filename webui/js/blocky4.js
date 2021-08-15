@@ -534,6 +534,7 @@ async function prime_allow() {
     let add_expiry_input = document.createElement('select');
     add_expiry_input.id = "add_expiry";
     let options = {
+        "10 minutes": 600,
         "1 hour": 3600,
         "2 hours": 7200,
         "12 hours": 43200,
