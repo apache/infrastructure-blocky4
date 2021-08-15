@@ -583,7 +583,7 @@ async function prime_allow() {
 
 
     let allow_count = all.allow.length.pretty();
-    let h1 = _h1(`Allowed IPs (${allow_count} blocks in total)`);
+    let h1 = _h1(`Allowed IPs (${allow_count} entries in total)`);
     main.appendChild(h1);
     all.allow.sort((a,b) => b.timestamp - a.timestamp);  // sort desc by timestamp
 
