@@ -55,13 +55,13 @@ let _table = () => htmlobj('table');
 let _a = (txt) => htmlobj('a', txt);
 
 
-async function unblock_ip(_entry) {
+async function unblock_ip(_entry, force = true) {
     if (confirm(`This will unblock ${_entry.ip} and add it to the allow-list for 10 minutes. Continue?`)) {
         result = await POST('allow', {
             ip: _entry.ip,
             reason: "Temporarily allow-listed for 10 minutes to unblock IP",
             expires: parseInt(new Date().getTime()/1000) + 600,
-            force: true
+            force: force
         })
         if (result.success === true) {
             alert("IP Unblocked. Please allow for a few moments for it to apply across the servers.");
@@ -283,7 +283,8 @@ async function prime_search(target, state) {
             let td_host = _td(entry.hostname);
             let td_chain = _td(entry.chain);
             let td_reason = _td(entry.extensions.replace(/\/\*\s*(.+)\s*\*\//, (b,a) => a));
-            let td_actions = _td('');
+            let td_actions = _td();
+            td_actions.appendChild(unblock_iptables_link(entry));
             td_ip.style.fontFamily = "monospace";
             if (entry.source.length > 16) td_ip.style.fontSize = "0.8rem";
             tr.appendChild(td_ip);
@@ -308,6 +309,15 @@ async function prime_search(target, state) {
         main.innerText = "Use the search bar in the top left corner for now...";
     }
 
+}
+
+function unblock_iptables_link(entry) {
+    let link = _a('Unblock');
+    let _entry = entry;
+    _entry.ip = _entry.source;
+    link.setAttribute("href", 'javascript:void(0);');
+    link.addEventListener('click', () => unblock_ip(_entry, false));
+    return link;
 }
 
 function rule_tr(rule) {
