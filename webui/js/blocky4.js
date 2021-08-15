@@ -310,10 +310,176 @@ async function prime_search(target, state) {
 
 }
 
+function rule_tr(rule) {
+    let tr = _tr();
+
+    // Description
+    let t_desc = _td();
+    let x_desc = document.createElement('input');
+    x_desc.setAttribute('type', 'text');
+    x_desc.setAttribute('id', `desc_${rule.id}`);
+    x_desc.style.width = "95%";
+    if (rule.description) {
+        x_desc.value = rule.description;
+    } else {
+        x_desc.placeholder = "Create a new rule here...";
+    }
+    t_desc.appendChild(x_desc);
+    tr.appendChild(t_desc);
+
+
+    // AggType
+    let t_agg = _td();
+    let x_agg = document.createElement('select');
+    x_agg.setAttribute('id', `agg_${rule.id}`);
+    for (let opt of ['requests', 'bytes']) {
+        let x_opt = document.createElement('option');
+        x_opt.value = opt;
+        x_opt.textContent = opt;
+        if (opt == rule.aggtype) x_opt.setAttribute('selected', 'selected');
+        x_agg.appendChild(x_opt);
+    }
+    t_agg.appendChild(x_agg);
+    tr.appendChild(t_agg);
+
+    // Limit
+    let t_limit = _td();
+    let x_limit = document.createElement('input');
+    x_limit.setAttribute('type', 'number');
+    x_limit.value = rule.limit;
+    x_limit.setAttribute('id', `limit_${rule.id}`);
+    x_limit.style.width = "95%";
+    t_limit.appendChild(x_limit);
+    tr.appendChild(t_limit);
+
+    // Timespan
+    let t_time = _td();
+    let x_time = document.createElement('input');
+    x_time.setAttribute('type', 'text');
+    x_time.setAttribute('id', `time_${rule.id}`);
+    x_time.style.width = "95%";
+    x_time.value = rule.duration;
+    t_time.appendChild(x_time);
+    tr.appendChild(t_time);
+
+    // Filters
+    let t_filters = _td();
+    let x_filters = document.createElement('textarea');
+    x_filters.setAttribute('id', `filters_${rule.id}`);
+    x_filters.style.width = "95%";
+    x_filters.textContent = rule.filters;
+    t_filters.appendChild(x_filters)
+    tr.appendChild(t_filters);
+
+    // Actions
+    let t_actions = _td();
+    t_actions.style.textAlign = 'center';
+    tr.appendChild(t_actions);
+
+
+    if (rule.description) {
+        let x_save = document.createElement('button');
+        x_save.innerText = 'Save';
+        x_save.addEventListener('click', () => patch_rule(rule));
+        t_actions.appendChild(x_save);
+
+        let x_delete = document.createElement('button');
+        x_delete.style.marginLeft = '32px';
+        x_delete.innerText = 'Delete';
+        x_delete.addEventListener('click', () => delete_rule(rule));
+        t_actions.appendChild(x_delete);
+    } else {
+        let x_save = document.createElement('button');
+        x_save.innerText = 'Create Rule';
+        x_save.addEventListener('click', () => create_rule(rule));
+        t_actions.appendChild(x_save);
+
+    }
+
+    return tr
+}
+
+function fetch_rule_data(rule) {
+    let desc = document.getElementById(`desc_${rule.id}`).value;
+    let agg = document.getElementById(`agg_${rule.id}`).value;
+    let limit = parseInt(document.getElementById(`limit_${rule.id}`).value);
+    let duration = document.getElementById(`time_${rule.id}`).value;
+    let filters = document.getElementById(`filters_${rule.id}`).value.trim();
+    return {
+        description: desc,
+        aggtype: agg,
+        limit: limit,
+        duration: duration,
+        filter: filters
+    }
+}
+async function delete_rule(rule) {
+    if (confirm("Are you sure you wish to delete this rule?")) {
+        let result = await DELETE('rules', {rule: rule.id});
+        alert(result.message);
+        if (result.success === true) location.reload();
+    }
+}
+
+async function patch_rule(rule) {
+    let new_rule = fetch_rule_data(rule);
+    new_rule.rule = rule.id;
+    let result = await PATCH('rules', new_rule);
+    alert(result.message);
+    if (result.success === true) location.reload();
+}
+async function create_rule(rule) {
+    let new_rule = fetch_rule_data(rule);
+    let result = await PUT('rules', new_rule);
+    alert(result.message);
+    if (result.success === true) location.reload();
+}
+
+async function prime_rules(target, state) {
+    let main = document.getElementById('main');
+    main.innerHTML = '';
+    let title = _h1("Block rules");
+    main.appendChild(title);
+
+    let t = _table();
+    main.appendChild(t);
+
+    let btheader = _tr();
+    btheader.appendChild(_th('Description', 500));
+    btheader.appendChild(_th('Aggregation Type', 120));
+    btheader.appendChild(_th('Limit', 120));
+    btheader.appendChild(_th('Timespan', 80));
+    btheader.appendChild(_th('Filters', 300));
+    btheader.appendChild(_th('Actions', 200));
+    t.appendChild(btheader);
+
+    let rules = await GET('rules');
+
+    for (let rule of rules) {
+        let tr = rule_tr(rule);
+        t.appendChild(tr);
+    }
+
+    let tr = _tr();
+    let td = _td();
+    td.appendChild(_hr());
+    td.colSpan = 6;
+    tr.appendChild(td);
+    t.appendChild(tr);
+
+    let new_rule = rule_tr({id: 9999, duration: "24h", limit: 100});
+    t.appendChild(new_rule);
+
+    let p = _p("Filters support regular Lucene match (foo = bar), exact terms match (foo == bar), regexp (foo ~= ba[rz]). All matches can be negated with !, such as !=, !==, !~= etc")
+    main.appendChild(p);
+
+}
+
 
 let actions = {
     frontpage: prime_frontpage,
-    search: prime_search
+    search: prime_search,
+    rules: prime_rules
 };
 
 
