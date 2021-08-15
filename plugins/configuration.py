@@ -47,6 +47,9 @@ class BlockyConfiguration:
         self.http_ip = yml.get("bind_ip", "127.0.0.1")
         self.http_port = int(yml.get("bind_port", 8080))
         self.client_iptables = {}  # Uploaded iptables from blocky clients. Only kept in memory.
+        self.pubsub_host = yml.get('pubsub_host')
+        self.pubsub_user = yml.get('pubsub_user')
+        self.pubsub_password = yml.get('pubsub_password')
 
         # Create table if not there yet
         new_db = False
