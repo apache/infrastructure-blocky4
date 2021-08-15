@@ -28,8 +28,14 @@ MAX_IPTABLES_RECORDS = 50
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
     now = int(time.time())
     source = formdata.get("source")
-    as_net = netaddr.IPNetwork(source)
-
+    try:
+        as_net = netaddr.IPNetwork(source)
+    except netaddr.core.AddrFormatError as e:
+        return {
+            "success": False,
+            "status": "invalid",
+            "message": f"Address parsing error: {e}"
+        }
     results = {"allow": [], "block": [], "iptables": []}
 
     # Search allow list
