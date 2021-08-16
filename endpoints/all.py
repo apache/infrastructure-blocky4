@@ -29,8 +29,9 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     total_blocks = len(block_items)
     total_allows = len(allow_items)
     if short:  # For not showing all 27482487 items, for front page
-        allow_items = sorted(allow_items, reverse=True, key=operator.itemgetter("timestamp"))[:25]
         block_items = sorted(block_items, reverse=True, key=operator.itemgetter("timestamp"))[:25]
+        if short != "block":
+            allow_items = sorted(allow_items, reverse=True, key=operator.itemgetter("timestamp"))[:25]
     return {
         "total_block": total_blocks,
         "total_allow": total_allows,
