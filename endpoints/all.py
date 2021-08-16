@@ -17,14 +17,25 @@
 
 import ahapi
 import plugins.configuration
+import operator
 
 """ block/allow list viewing endpoint for Blocky/4"""
 
 
 async def process(state: plugins.configuration.BlockyConfiguration, request, formdata: dict) -> dict:
+    short = formdata.get('short', False)
+    allow_items = [x for x in state.allow_list]
+    block_items = [x for x in state.block_list]
+    total_blocks = len(block_items)
+    total_allows = len(allow_items)
+    if short:  # For not showing all 27482487 items, for front page
+        allow_items = sorted(allow_items, reverse=True, key=operator.itemgetter("timestamp"))[:25]
+        block_items = sorted(block_items, reverse=True, key=operator.itemgetter("timestamp"))[:25]
     return {
-        "allow": [x for x in state.allow_list],
-        "block": [x for x in state.block_list],
+        "total_block": total_blocks,
+        "total_allow": total_allows,
+        "allow": allow_items,
+        "block": block_items,
     }
 
 
