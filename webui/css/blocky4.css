@@ -155,3 +155,7 @@ footer {
     font-size: 0.8rem;
     color: #bbb;
 }
+
+textarea:focus, input:focus{
+    outline: none;
+}
