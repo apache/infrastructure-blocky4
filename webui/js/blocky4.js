@@ -101,10 +101,10 @@ function unblock_link(entry, allowlist=false) {
 }
 
 async function prime_frontpage() {
-    let all = await GET("all");
+    let all = await GET("all?short=true");
     let main = document.getElementById('main');
     main.innerHTML = "";
-    let block_count = all.block.length.pretty();
+    let block_count = all.total_block.pretty();
     let h1 = _h1(`Recent activity (${block_count} blocks in total)`);
     main.appendChild(h1);
     all.block.sort((a,b) => b.timestamp - a.timestamp);  // sort desc by timestamp
@@ -141,9 +141,6 @@ async function prime_frontpage() {
         tr.appendChild(td_action);
         activity_table.appendChild(tr);
         results_shown++;
-        if (results_shown > 25 && all.block.length > 25) {
-            break
-        }
     }
     if (results_shown === 0) {
         let tr = _tr();
