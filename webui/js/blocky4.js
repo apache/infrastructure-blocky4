@@ -514,7 +514,7 @@ async function save_allow() {
 
 
 async function prime_allow() {
-    let all = await GET("all");
+    let all = await GET("all?short=block");
     let main = document.getElementById('main');
     main.innerHTML = "";
 
