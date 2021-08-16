@@ -652,13 +652,10 @@ async function prime_allow() {
         tr.appendChild(td_action);
         activity_table.appendChild(tr);
         results_shown++;
-        if (results_shown > 25 && all.block.length > 25) {
-            break
-        }
     }
     if (results_shown === 0) {
         let tr = _tr();
-        tr.innerText = "No activity found...";
+        tr.innerText = "No entries found...";
         activity_table.appendChild(_tr);
     }
 
