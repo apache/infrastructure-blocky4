@@ -125,7 +125,7 @@ class BanRule:
         offenders = []
         try:
             candidates = await find_top_clients(config, aggtype=self.aggtype, duration=self.duration, filters=self.filters)
-        except (asyncio.exceptions.TimeoutError, elasticsearch.exceptions.ConnectionTimeout):
+        except (asyncio.exceptions.TimeoutError, elasticsearch.exceptions.ConnectionTimeout, elasticsearch.exceptions.ConnectionError):
             print("Offender search timed out, retrying later!")
             candidates = []
         for candidate in candidates:
