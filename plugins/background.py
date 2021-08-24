@@ -123,13 +123,13 @@ class BanRule:
     async def list_offenders(self, config: plugins.configuration.BlockyConfiguration):
         """Find top clients by $metric, see if they cross the limit..."""
         offenders = []
+        candidates = []
         try:
             candidates = await find_top_clients(config, aggtype=self.aggtype, duration=self.duration, filters=self.filters)
         except (asyncio.exceptions.TimeoutError, elasticsearch.exceptions.ConnectionTimeout, elasticsearch.exceptions.ConnectionError):
             print("Offender search timed out, retrying later!")
         except elasticsearch.exceptions.TransportError:
             print("Transport error (503?), retrying later")
-            candidates = []
         for candidate in candidates:
             if candidate[1] >= self.limit:
                 offenders.append(candidate)
