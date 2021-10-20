@@ -29,7 +29,7 @@ import plugins.lists
 import datetime
 
 MAX_DB_DAYS = 3  # Only look backwards up to three days. No sense in involving every index in our search.
-CLIENT_IP_NAME = "clientip"
+CLIENT_IP_NAME = "client_ip"
 TIMESTAMP_NAME = "@timestamp"
 
 
