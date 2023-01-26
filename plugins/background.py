@@ -38,7 +38,7 @@ async def find_top_clients(
     aggtype: typing.Literal["bytes", "requests"] = "requests",
     duration: str = "12h",
     no_hits: int = 100,
-    filters: typing.List[str] = [],
+    filters: typing.List[str] = None,
 ) -> typing.List[typing.Tuple[str, int]]:
     """Finds the top clients (IPs) in the database based on the parameters provided.
     Searches for the top clients by either traffic volume (bytes) or requests."""
