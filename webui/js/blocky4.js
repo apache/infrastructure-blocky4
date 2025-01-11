@@ -696,8 +696,9 @@ async function prime_block() {
     add_table.style.tableLayout = 'fixed';
     main.appendChild(add_table);
     let atheader = _tr();
-    atheader.appendChild(_th('Source IP', 300));
-    atheader.appendChild(_th('Expiry', 120));
+    atheader.appendChild(_th('Source IP', 240));
+    atheader.appendChild(_th('Expiry', 80));
+    atheader.appendChild(_th('Force Block', 100));
     atheader.appendChild(_th('Reason', 500));
     atheader.appendChild(_th('Host', 100));
     atheader.appendChild(_th(' ', 100));
@@ -734,6 +735,15 @@ async function prime_block() {
     }
     add_expiry.appendChild(add_expiry_input);
     add_tr.appendChild(add_expiry);
+
+    // Force
+    let add_force = _td();
+    let add_force_input = document.createElement('input');
+    add_force_input.setAttribute('type', 'checkbox');
+    add_force_input.setAttribute('value', 'true');
+    add_force_input.id = 'add_force';
+    add_force.appendChild(add_force_input);
+    add_tr.appendChild(add_force);
 
     // Reason
     let add_reason = _td();
