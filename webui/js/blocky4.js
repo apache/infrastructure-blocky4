@@ -668,13 +668,16 @@ async function save_block() {
     let reason = document.getElementById('add_reason').value;
     let host = document.getElementById('add_host').value;
     let true_expiry = parseInt(new Date().getTime() / 1000) + expiry;
+    let force = document.getElementById('add_force').checked ? true : false;
+    
     if (expiry == -1) true_expiry = -1;
 
     let result = await PUT('block', {
         ip: ip,
         host: host,
         reason: reason,
-        expires: true_expiry
+        expires: true_expiry,
+        force: force
     });
     alert(result.message);
     if (result.success === true) location.reload();
