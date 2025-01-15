@@ -727,7 +727,10 @@ async function prime_block() {
         "2 hours": 7200,
         "12 hours": 43200,
         "24 hours": 86400,
-        "7 days": 604800,
+        "7 days":  86400 *  7,
+        "30 days": 86400 * 30,
+        "60 days": 86400 * 60,
+        "90 days": 86400 * 90,
         "never": -1
     }
     for (let key in options) {
