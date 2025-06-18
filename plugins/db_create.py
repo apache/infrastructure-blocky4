@@ -50,3 +50,13 @@ CREATE TABLE "auditlog" (
 );
 """
 
+CREATE_DB_SANTAS_LIST = """
+CREATE TABLE "santalist" (
+	"id"	     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"ip"	     TEXT NOT NULL,
+	"niceness"   INTEGER NOT NULL,
+	"updated"    INTEGER NOT NULL,
+        "token"      TEXT NOT NULL,
+);
+"""
+
