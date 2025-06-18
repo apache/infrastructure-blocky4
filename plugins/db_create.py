@@ -56,7 +56,7 @@ CREATE TABLE "santalist" (
 	"ip"	     TEXT NOT NULL,
 	"niceness"   INTEGER NOT NULL,
 	"updated"    INTEGER NOT NULL,
-        "token"      TEXT NOT NULL,
+    "token"      TEXT NOT NULL
 );
 """
 
