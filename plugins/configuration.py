@@ -58,8 +58,9 @@ class BlockyConfiguration:
             self.sqlite.run(plugins.db_create.CREATE_DB_RULES)
             self.sqlite.run(plugins.db_create.CREATE_DB_LISTS)
             self.sqlite.run(plugins.db_create.CREATE_DB_AUDIT)
-            print(f"Database file {self.database_filepath} has been successfully initialized")
-            new_db = True
+        if not self.sqlite.table_exists("santalist"):
+            print(f"Making santa's list")
+            self.sqlite.run(plugins.db_create.CREATE_DB_SANTAS_LIST)
 
         # Init and fetch existing blocks and allows
         self.block_list = plugins.lists.List(self, "block")
