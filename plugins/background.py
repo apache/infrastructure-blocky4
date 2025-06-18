@@ -27,6 +27,7 @@ import time
 import plugins.configuration
 import plugins.lists
 import datetime
+import uuid
 
 MAX_DB_DAYS = 3  # Only look backwards up to three days. No sense in involving every index in our search.
 CLIENT_IP_NAME = "client_ip"
@@ -202,7 +203,23 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                         off_reason = f"{rule['description']} ({off_limit} >= {rule['limit']})"
                         print(f"Found new offender, {off_ip}: {off_reason}")
                         now = int(time.time())
+                        santa_entry = config.sqlite.fetchone("santalist", ip=off_ip) or {
+                            "ip": off_ip,
+                            "niceness": 0,
+                        }
+                        santa_entry["updated"] = now
+                        santa_entry["niceness"] = santa_entry.get("niceness", 0) - 1
+                        santa_entry["token"] = str(uuid.uuid4())  # We always refresh this when a new infraction incurs to prevent token pre-caching
+                        
+                        # TODO: "Configify" this
                         expires = now + config.default_expire_seconds
+                        if santa_entry["niceness"] >= -2:  # First two infractions gets you a week suspension
+                           expires = now + (7*86400)
+                        elif santa_entry["niceness"] == -3:  # Next gets you a month
+                           expires = now + (30.3*86400)
+                        else: # Next gets you six months
+                            expires = now + (6*30.3*86400)
+                        
                         config.block_list.add(
                             ip=off_ip,
                             timestamp=now,
@@ -210,4 +227,8 @@ async def run(config: plugins.configuration.BlockyConfiguration):
                             reason=off_reason,
                             host=plugins.configuration.DEFAULT_HOST_BLOCK,
                         )
+
+                        # upsert santa list entry
+                        config.sqlite.upsert("santalist", santa_entry, ip=off_ip)
+                        
         await asyncio.sleep(15)
