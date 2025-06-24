@@ -20,6 +20,7 @@ import plugins.configuration
 import operator
 import time
 import uuid
+import aiohttp.web
 
 """ client-side unblocking endpoint for Blocky/4"""
 
@@ -40,10 +41,10 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
                     entry["token"] = str(uuid.uuid4())  # Moon Healing Escalation....REFRESH! (so they can't use it again)
                     state.sqlite.update("santalist", entry, ip=my_ip)  # Update santa's list db with new token
                     state.allow_list.add(ip=my_ip, expires=expires, reason="Temporary soft-allowlisted to unblock, through self-serve UI.", host="*", force=True)
-                    return "Successfully unblocked IP."
-                return "You cannot automatically unblock this IP address due to the infraction count. Please contact abuse@infra.apache.org instead."
-            return "This token is not valid for the IP you are connecting from. It must be used from the IP address that originated the block."
-    return "Token is invalid or has already been succesfully used once."
+                    return aiohttp.web.Response(status=200, text=f"Successfully unblocked IP {my_ip}")
+                return aiohttp.web.Response(status=422, text="You cannot automatically unblock this IP address due to its infraction count. Please contact abuse@infra.apache.org instead.")
+            return aiohttp.web.Response(status=422, text="This token is not valid for the IP address you are currently connecting from. It must be used from the IP address that originated the block.")
+    return aiohttp.web.Response(status=410, text="This token is invalid or has already been used to unblock this IP address. If you are still blocked from accessing our resources, please contact abuse@infra.apache.org")
 
 
 def register(config: plugins.configuration.BlockyConfiguration):
