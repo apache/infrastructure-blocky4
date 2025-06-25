@@ -45,6 +45,7 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
             last_attempt = pending_unblocks.get(my_ip, 0)
             if last_attempt < (time.time() - RATE_LIMIT):
                 token = entry["token"]
+                pending_unblocks[my_ip] = time.time()  # Mark that we sent a token just now.
                 asfpy.messaging.mail(
                     recipient = email_address,
                     subject = f"Token for unblocking IP {my_ip}",
