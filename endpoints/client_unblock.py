@@ -40,8 +40,9 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
         if not (len(email_parsed) == 2 and '@' in email_parsed[1]):
             return aiohttp.web.Response(status=400, text=f"Invalid email address specified: {email_address}")
         my_ip = request.headers["x-forwarded-for"]
-        entry = state.sqlite.fetchone("santalist", ip=my_ip)
-        if entry and email_address:
+        entry = state.sqlite.fetchone("santalist", ip=my_ip)    # Santa list entry for tokens
+        block_entry = state.sqlite.fetchone("lists", ip=my_ip, type="block")  # Actual block list entry, does it exist or is this request in vain?
+        if entry and block_entry and email_address:
             last_attempt = pending_unblocks.get(my_ip, 0)
             if last_attempt < (time.time() - RATE_LIMIT):
                 token = entry["token"]
