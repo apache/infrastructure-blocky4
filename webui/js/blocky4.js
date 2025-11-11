@@ -671,16 +671,35 @@ async function save_block() {
     let force = document.getElementById('add_force').checked ? true : false;
     
     if (expiry == -1) true_expiry = -1;
-
-    let result = await PUT('block', {
-        ip: ip,
-        host: host,
-        reason: reason,
-        expires: true_expiry,
-        force: force
-    });
-    alert(result.message);
-    if (result.success === true) location.reload();
+    if (ip.includes(",")) { // multiple IPs, comma separated
+        let all_good = true;
+        for (const xip of ip.split(",")) {
+            let result = await PUT('block', {
+                ip: xip.trim(),
+                host: host,
+                reason: reason,
+                expires: true_expiry,
+                force: force
+            });
+            if (result.success === true) continue
+            else {
+                all_good = false;
+                alert(result.message);
+                break
+            }
+        }
+        if (all_good) location.reload();
+    } else {        
+        let result = await PUT('block', {
+            ip: ip,
+            host: host,
+            reason: reason,
+            expires: true_expiry,
+            force: force
+        });
+        alert(result.message);
+        if (result.success === true) location.reload();
+    }
 }
 
 
