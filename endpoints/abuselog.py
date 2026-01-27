@@ -27,7 +27,7 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     now = int(time.time())
     ip = formdata.get("ip")
     log = formdata.get("log")
-    apikey = request.headers.get["x-apikey"]
+    apikey = request.headers.get("x-apikey", "")
     if not apikey or not state.apikey or apikey != state.apikey:
         return {"success": False, "status": "failure", "message": "Unauthorized!"}
     if ip and log:
