@@ -59,3 +59,12 @@ CREATE TABLE "santalist" (
 );
 """
 
+
+CREATE_DB_ABUSELOG = """
+CREATE TABLE "abuselog" (
+	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	"ip"	TEXT NOT NULL,
+	"log"	TEXT NOT NULL,
+	"timestamp"	INTEGER NOT NULL
+);
+"""
