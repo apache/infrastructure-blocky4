@@ -50,6 +50,7 @@ class BlockyConfiguration:
         self.pubsub_host = yml.get('pubsub_host')
         self.pubsub_user = yml.get('pubsub_user')
         self.pubsub_password = yml.get('pubsub_password')
+        self.apikey = yml.get('apikey', '')  # used for certain client operations (like socket gnome)
 
         # Create table if not there yet
         new_db = False
