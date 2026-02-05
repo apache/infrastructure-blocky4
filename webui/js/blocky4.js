@@ -557,6 +557,7 @@ async function prime_allow() {
         "12 hours": 43200,
         "24 hours": 86400,
         "7 days": 604800,
+        "30 days": 2592000,
         "never": -1
     }
     for (let key in options) {
