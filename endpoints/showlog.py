@@ -45,7 +45,7 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
             data = entry.get(_type, "")
             if data:
                 reports.append(data)
-        count -= 1
+                count -= 1
         if count <= 0:
           break
 
