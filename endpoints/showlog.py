@@ -28,6 +28,7 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     now = int(time.time())
     source = formdata.get("source")
     count = int(formdata.get("count", 1))
+    _type = "csv" if formdata.get("type", "log") == "csv" else "log"
     try:
         as_net = netaddr.IPNetwork(source)
     except netaddr.core.AddrFormatError as e:
@@ -41,7 +42,9 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
     for entry in reversed(results):
         network = netaddr.IPNetwork(entry['ip'])
         if network in as_net or as_net in network:
-            reports.append(entry["log"])
+            data = entry.get(_type, "")
+            if data:
+                reports.append(data)
         count -= 1
         if count <= 0:
           break
@@ -49,7 +52,10 @@ async def process(state: plugins.configuration.BlockyConfiguration, request, for
 
     # All good!
     if reports:
-        return aiohttp.web.Response(status=200, content_type="text/plain", text="\n---------------------------------------------\n\n".join(reports))
+        ct = "text/plain"
+        if _type == "csv":
+            ct = "text/csv"
+        return aiohttp.web.Response(status=200, content_type=ct, text="\n---------------------------------------------\n\n".join(reports))
     else:
         return "No results found..."
 
