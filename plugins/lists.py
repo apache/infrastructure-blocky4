@@ -93,11 +93,15 @@ class List:
             if entry.network in network.network or network.network in entry.network:
                 if force:
                     to_remove.append(network)
+                elif network.host != "*":  # Upgrade single-host to wildcard on second block
+                    entry.host = "*"
+                    to_remove.append(network)
                 else:
-                    raise BlockListException(
-                        f"IP entry {ip} conflicts with block list entry {network.network}. "
-                        "Please address this or use force=true to override."
-                    )
+                    if network.host == "*" or network.host == entry.host:  # If already blocked, bail
+                        raise BlockListException(
+                            f"IP entry {ip} conflicts with block list entry {network.network}. "
+                            "Please address this or use force=true to override."
+                        )
 
         # If force=true and a conflict was found, remove the conflicting entry
         for d_entry in to_remove:
