@@ -91,10 +91,10 @@ class List:
         # Check if IP address conflicts with an entry on the block list
         for network in self.state.block_list:
             if entry.network in network.network or network.network in entry.network:
-                if force:
-                    to_remove.append(network)
-                elif network.host != "*":  # Upgrade single-host to wildcard on second block
+                if network.host != "*":  # Upgrade single-host to wildcard on second block
                     entry.host = "*"
+                    to_remove.append(network)
+                elif force:
                     to_remove.append(network)
                 else:
                     if network.host == "*" or network.host == entry.host:  # If already blocked, bail
